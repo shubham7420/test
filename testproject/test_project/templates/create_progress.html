@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Create Daily Progress</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    a.button {
+      display: inline-block;
+      margin: 10px 10px 30px 0;
+      padding: 10px 20px;
+      background: #28a745;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    a.button:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .container h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      color: #555;
+      font-weight: bold;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    button[type="submit"]:hover {
+      background: #0056b3;
+    }
+
+    .message {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .success {
+      color: #28a745;
+    }
+
+    .error {
+      color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ Back Buttons -->
+  <a href="/" class="button">🏠 Index Page</a>
+  <a href="/progress/list/" class="button">📋 Back to Progress List</a>
+
+  <div class="container">
+    <h2>🗓️ Create Daily Progress</h2>
+    <form id="progressForm">
+      <div class="form-group">
+        <label for="activityCode">Activity Code</label>
+        <input type="text" id="activityCode" name="activity_code" placeholder="Enter Activity Code" required />
+      </div>
+
+      <div class="form-group">
+        <label for="activityName">Activity Name</label>
+        <input type="text" id="activityName" name="activity_name" placeholder="Enter Activity Name" required />
+      </div>
+
+      <div class="form-group">
+        <label for="progressQty">Progress Qty</label>
+        <input type="number" id="progressQty" name="progress_qty" placeholder="Enter Progress Quantity" step="any" required />
+      </div>
+
+      <button type="submit">💾 Save Progress</button>
+      <div id="message" class="message"></div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('progressForm');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        activity_code: document.getElementById('activityCode').value,
+        activity_name: document.getElementById('activityName').value,
+        progress_qty: parseFloat(document.getElementById('progressQty').value) || 0
+      };
+      try {
+        const response = await fetch('/progress/add/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+          message.textContent = '✅ Daily progress created successfully!';
+          message.className = 'message success';
+          form.reset();
+        } else {
+          message.textContent = '❌ ' + result.message;
+          message.className = 'message error';
+        }
+      } catch (err) {
+        console.error(err);
+        message.textContent = '❌ Something went wrong!';
+        message.className = 'message error';
+      }
+    });
+  </script>
+
+</body>
+</html>

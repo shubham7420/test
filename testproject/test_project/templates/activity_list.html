@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>📋 Activity List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f8fb;
+      padding: 40px 20px;
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    a.button {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #28a745;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      margin: 0 10px 20px 0;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    a.button:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+
+    .table-wrapper {
+      overflow: hidden;
+      border-radius: 5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background: #007bff;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    tr:hover {
+      background: #f1f5f9;
+    }
+
+    button {
+      padding: 6px 12px;
+      margin-right: 5px;
+      background: #007bff;
+      border: none;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background: #0056b3;
+      transform: translateY(-1px);
+    }
+
+    button.delete {
+      background: #dc3545;
+    }
+
+    button.delete:hover {
+      background: #c82333;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📋 Activity List</h2>
+
+  <!-- ✅ Navigation Buttons -->
+  <a href="/" class="button">🏠 Index Page</a>
+  <a href="/activities/add/" class="button">➕ Create New Activity</a>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Project Name</th>
+          <th>Sub Project</th>
+          <th>Activity Code</th>
+          <th>Activity Name</th>
+          <th>Unit</th>
+          <th>Qty</th>
+          <th>Rate</th>
+          <th>Amount</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="activityTableBody">
+        <!-- JS will fill this -->
+      </tbody>
+    </table>
+  </div>
+
+<script>
+  async function loadActivities() {
+    const res = await fetch('/activities/all/');
+    const data = await res.json();
+    if (data.status === 'success') {
+      const tbody = document.getElementById('activityTableBody');
+      tbody.innerHTML = '';
+      data.activities.forEach(act => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${act.id}</td>
+          <td>${act.project_name}</td>
+          <td>${act.sub_project}</td>
+          <td>${act.activity_code}</td>
+          <td>${act.activity_name}</td>
+          <td>${act.unit}</td>
+          <td>${act.qty}</td>
+          <td>${act.rate}</td>
+          <td>${act.amount}</td>
+          <td>
+            <button onclick='editActivity(${JSON.stringify(act)})'>✏️ Edit</button>
+            <button class="delete" onclick="deleteActivity(${act.id})">🗑️ Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } else {
+      alert(data.message);
+    }
+  }
+
+  loadActivities();
+
+  function editActivity(act) {
+    const newProject = prompt("Edit Project Name:", act.project_name);
+    if (newProject === null) return;
+
+    const newSub = prompt("Edit Sub Project:", act.sub_project);
+    if (newSub === null) return;
+
+    const newCode = prompt("Edit Activity Code:", act.activity_code);
+    if (newCode === null) return;
+
+    const newName = prompt("Edit Activity Name:", act.activity_name);
+    if (newName === null) return;
+
+    const newUnit = prompt("Edit Unit:", act.unit);
+    if (newUnit === null) return;
+
+    const newQty = parseFloat(prompt("Edit Qty:", act.qty));
+    if (isNaN(newQty)) return;
+
+    const newRate = parseFloat(prompt("Edit Rate:", act.rate));
+    if (isNaN(newRate)) return;
+
+    const newAmount = parseFloat(prompt("Edit Amount:", act.amount));
+    if (isNaN(newAmount)) return;
+
+    fetch(`/activities/${act.id}/update/`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        project_name: newProject,
+        sub_project: newSub,
+        activity_code: newCode,
+        activity_name: newName,
+        unit: newUnit,
+        qty: newQty,
+        rate: newRate,
+        amount: newAmount
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message);
+      loadActivities();
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error updating activity.");
+    });
+  }
+
+  function deleteActivity(id) {
+    if (confirm(`Are you sure to delete activity ${id}?`)) {
+      fetch(`/activities/${id}/delete/`, {
+        method: 'DELETE'
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        loadActivities();
+      });
+    }
+  }
+</script>
+
+</body>
+</html>

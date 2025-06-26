@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard - Project Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .dashboard {
+      background: #ffffff;
+      padding: 50px 60px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .dashboard h1 {
+      margin-bottom: 40px;
+      font-size: 32px;
+      color: #333;
+    }
+
+    .dashboard a {
+      display: block;
+      width: 250px;
+      margin: 15px auto;
+      padding: 15px 20px;
+      background: #007bff;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 18px;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .dashboard a:hover {
+      background: #0056b3;
+      transform: translateY(-2px);
+    }
+
+    .dashboard a.create {
+      background: #28a745;
+    }
+
+    .dashboard a.create:hover {
+      background: #1e7e34;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <h1>Welcome to Shubham</h1>
+
+    <!-- ✅ Use relative links that match your Django routes -->
+    <a href="/projects/add/">📋 Project Master</a>
+    <a href="/activities/add/">📁 Activity Master</a>
+    <a href="/progress/add/">📊 Daily Progress</a>
+  </div>
+</body>
+</html>

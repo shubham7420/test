@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Create Project</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    a.button {
+      display: inline-block;
+      margin: 10px 10px 20px;
+      padding: 10px 20px;
+      background: #28a745;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    a.button:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+
+    .container {
+      background: #fff;
+      padding: 35px 40px;
+      border-radius: 10px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .container h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      color: #555;
+      font-weight: bold;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 17px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background: #0056b3;
+      transform: translateY(-2px);
+    }
+
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ Navigation Buttons -->
+  <a href="/" class="button">🏠 Index Page</a>
+  <a href="/projects/list/" class="button">🔙 Back to Project List</a>
+
+  <div class="container">
+    <h2>Create Project</h2>
+    <form id="projectForm">
+      <div class="form-group">
+        <label for="projectName">Project Name</label>
+        <input type="text" id="projectName" name="project_name" placeholder="Enter Project Name" required />
+      </div>
+      <div class="form-group">
+        <label for="subProject">Sub Project</label>
+        <input type="text" id="subProject" name="sub_project" placeholder="Enter Sub Project" required />
+      </div>
+      <button type="submit">💾 Save Project</button>
+      <div id="message" class="message"></div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('projectForm');
+    const message = document.getElementById('message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        project_name: document.getElementById('projectName').value.trim(),
+        sub_project: document.getElementById('subProject').value.trim()
+      };
+
+      try {
+        const response = await fetch('/projects/add/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+          alert('✅ Project created successfully!');
+          window.location.href = '/projects/add/';
+        } else {
+          message.textContent = '❌ ' + result.message;
+          message.className = 'message error';
+        }
+      } catch (err) {
+        console.error(err);
+        message.textContent = '❌ Something went wrong!';
+        message.className = 'message error';
+      }
+    });
+  </script>
+</body>
+</html>

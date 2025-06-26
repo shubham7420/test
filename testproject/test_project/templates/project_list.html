@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Project List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f8fb;
+      padding: 40px;
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    a.button {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #28a745;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      margin: 0 10px 20px 0;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    a.button:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 15px 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background: #007bff;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    tr:hover {
+      background: #f1f5f9;
+    }
+
+    button {
+      padding: 8px 12px;
+      margin-right: 5px;
+      background: #007bff;
+      border: none;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background: #0056b3;
+      transform: translateY(-1px);
+    }
+
+    button.delete {
+      background: #dc3545;
+    }
+
+    button.delete:hover {
+      background: #c82333;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📋 Project List</h2>
+
+  <!-- ✅ Navigation Buttons -->
+  <a href="/" class="button">🏠 Index Page</a>
+  <a href="/projects/add/" class="button">➕ Create New Project</a>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Project Name</th>
+        <th>Sub Project</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="projectTableBody">
+      <!-- JS will load data here -->
+    </tbody>
+  </table>
+
+  <script>
+    async function loadProjects() {
+      try {
+        const res = await fetch('/projects/all/');
+        const data = await res.json();
+        if (data.status === 'success') {
+          const tbody = document.getElementById('projectTableBody');
+          tbody.innerHTML = '';
+          data.projects.forEach(proj => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${proj.id}</td>
+              <td>${proj.project_name}</td>
+              <td>${proj.sub_project}</td>
+              <td>
+                <button onclick="editProject(${proj.id}, '${proj.project_name}', '${proj.sub_project}')">Edit</button>
+                <button class="delete" onclick="deleteProject(${proj.id})">Delete</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to load projects.");
+      }
+    }
+
+    loadProjects();
+
+    function editProject(id, currentName, currentSub) {
+      const newName = prompt("Edit Project Name:", currentName);
+      if (newName === null) return;
+
+      const newSub = prompt("Edit Sub Project:", currentSub);
+      if (newSub === null) return;
+
+      fetch(`/projects/${id}/update/`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_name: newName.trim(),
+          sub_project: newSub.trim()
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        loadProjects();
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Error updating project.");
+      });
+    }
+
+    function deleteProject(id) {
+      if (confirm(`Are you sure you want to delete project ${id}?`)) {
+        fetch(`/projects/${id}/delete/`, {
+          method: 'DELETE'
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message);
+          loadProjects();
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Error deleting project.");
+        });
+      }
+    }
+  </script>
+
+</body>
+</html>
